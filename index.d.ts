@@ -295,7 +295,8 @@ declare module "gpl-core" {
   import { ChildProcessWithoutNullStreams } from 'child_process'
 
   export class Client extends EventEmitter {
-    launch(options: ILauncherOptions): Promise<ChildProcessWithoutNullStreams | null>;
+    init(options: ILauncherOptions): Promise<ChildProcessWithoutNullStreams | null>;
+    launch(): Promise<ChildProcessWithoutNullStreams | null>;
     checkIfVersionDownloaded(): Promise<boolean>;
     protected printVersion(): void;
     protected createRootDirectory(): void;
