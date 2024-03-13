@@ -1,6 +1,6 @@
 {
   "name": "gpl-core",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight module that downloads and runs Minecraft using javascript / NodeJS",
   "main": "index.js",
   "dependencies": {
