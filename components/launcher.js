@@ -4,7 +4,7 @@ const Handler = require('./handler')
 const fs = require('fs')
 const EventEmitter = require('events').EventEmitter
 
-class MCLCore extends EventEmitter {
+class GPLCore extends EventEmitter {
   async launch (options) {
     try {
       this.options = { ...options }
@@ -134,6 +134,29 @@ class MCLCore extends EventEmitter {
     }
   }
 
+  async checkIfVersionDownloaded() {
+    try {
+      const versionFile = await this.handler.getVersion();
+      const directory = this.options.overrides.directory || path.join(this.options.root, 'versions', this.options.version.custom ? this.options.version.custom : this.options.version.number);
+      const mcPath = this.options.overrides.minecraftJar || (this.options.version.custom
+          ? path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.jar`)
+          : path.join(directory, `${this.options.version.number}.jar`));
+
+      // Проверяем, существует ли файл версии Minecraft в указанном пути
+      if (fs.existsSync(mcPath)) {
+        // Здесь вы можете добавить дополнительную логику, если требуется
+        console.log(`Версия Minecraft ${versionFile.id} уже скачана.`);
+        return true; // Версия уже скачана
+      } else {
+        console.log(`Версия Minecraft ${versionFile.id} еще не скачана.`);
+        return false; // Версия еще не скачана
+      }
+    } catch (error) {
+      console.error('Ошибка при проверке версии Minecraft:', error);
+      return false; // Ошибка при проверке версии
+    }
+  }
+
   printVersion () {
     if (fs.existsSync(path.join(__dirname, '..', 'package.json'))) {
       const { version } = require('../package.json')
@@ -189,4 +212,4 @@ class MCLCore extends EventEmitter {
   }
 }
 
-module.exports = MCLCore
+module.exports = GPLCore
