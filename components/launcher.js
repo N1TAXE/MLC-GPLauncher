@@ -189,7 +189,7 @@ class GPLCore extends EventEmitter {
           throw new Error(`Failed to fetch Forge file from ${url}`)
         }
         const modloadersDir = path.resolve(path.join(this.options.root, 'modloaders'))
-        await this.downloadAsync(url, modloadersDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'mod-loader')
+        await this.handler.downloadAsync(url, modloadersDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'mod-loader')
         this.options.forge = path.resolve(`${modloadersDir}/forge-${this.options.version.number}-${this.options.forge}.jar`)
 
         modifyJson = await this.handler.getForgedWrapped()
