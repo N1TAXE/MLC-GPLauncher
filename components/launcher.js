@@ -136,24 +136,13 @@ class GPLCore extends EventEmitter {
 
   async checkIfVersionDownloaded() {
     try {
-      const versionFile = await this.handler.getVersion();
       const directory = this.options.overrides.directory || path.join(this.options.root, 'versions', this.options.version.custom ? this.options.version.custom : this.options.version.number);
       const mcPath = this.options.overrides.minecraftJar || (this.options.version.custom
           ? path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.jar`)
           : path.join(directory, `${this.options.version.number}.jar`));
-
-      // Проверяем, существует ли файл версии Minecraft в указанном пути
-      if (fs.existsSync(mcPath)) {
-        // Здесь вы можете добавить дополнительную логику, если требуется
-        console.log(`Версия Minecraft ${versionFile.id} уже скачана.`);
-        return true; // Версия уже скачана
-      } else {
-        console.log(`Версия Minecraft ${versionFile.id} еще не скачана.`);
-        return false; // Версия еще не скачана
-      }
+      return fs.existsSync(mcPath);
     } catch (error) {
-      console.error('Ошибка при проверке версии Minecraft:', error);
-      return false; // Ошибка при проверке версии
+      return false;
     }
   }
 
