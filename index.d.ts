@@ -5,8 +5,13 @@ declare module "gpl-core" {
 
   interface DistTypes {
     version: string;
+    "forge": string;
+    "server": {
+      "address": string;
+      "port": string;
+    }
     name: string;
-    mods: ModTypes[];
+    mods: string[];
   }
 
   interface ModTypes {

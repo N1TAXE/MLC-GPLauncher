@@ -5,7 +5,8 @@ const fs = require('fs')
 const EventEmitter = require('events').EventEmitter
 
 class GPLCore extends EventEmitter {
-  async init(options){
+  async init(options, dist){
+    this.dist = { ...dist }
     this.options = { ...options }
     this.options.root = path.resolve(this.options.root)
     this.options.overrides = {
