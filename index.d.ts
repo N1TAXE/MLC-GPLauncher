@@ -3,6 +3,12 @@
 declare module "gpl-core" {
   type OS = "windows" | "osx" | "linux";
 
+  interface DistTypes {
+    version: string;
+    name: string;
+    mods: ModTypes[];
+  }
+
   interface ModTypes {
     slug: string;
     title: string;
@@ -321,7 +327,7 @@ declare module "gpl-core" {
   import { ChildProcessWithoutNullStreams } from 'child_process'
 
   export class Client extends EventEmitter {
-    init(options: ILauncherOptions): Promise<ChildProcessWithoutNullStreams | null>;
+    init(options: ILauncherOptions, dist: DistTypes): Promise<ChildProcessWithoutNullStreams | null>;
     launch(): Promise<ChildProcessWithoutNullStreams | null>;
     checkIfVersionDownloaded(): Promise<boolean>;
     protected printVersion(): void;
