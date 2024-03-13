@@ -189,7 +189,10 @@ class GPLCore extends EventEmitter {
           throw new Error(`Failed to fetch Forge file from ${url}`)
         }
         const modloadersDir = path.resolve(path.join(this.options.root, 'modloaders'))
-        await this.handler.downloadAsync(url, modloadersDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'mod-loader')
+        if (!fs.existsSync(path.join(modloadersDir, `forge-${this.options.version.number}-${this.options.forge}.jar`))) {
+          await this.handler.downloadAsync(url, modloadersDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'mod-loader')
+        }
+
         this.options.forge = path.resolve(`${modloadersDir}/forge-${this.options.version.number}-${this.options.forge}.jar`)
 
         modifyJson = await this.handler.getForgedWrapped()
@@ -206,7 +209,10 @@ class GPLCore extends EventEmitter {
 
   startMinecraft (launchArguments) {
     const minecraft = child.spawn(this.options.javaPath ? this.options.javaPath : 'java', launchArguments,
-      { cwd: this.options.overrides.cwd || this.options.root, detached: this.options.overrides.detached })
+      {
+        cwd: this.options.overrides.cwd || this.options.root,
+        detached: this.options.overrides.detached
+      })
     minecraft.stdout.on('data', (data) => this.emit('data', data.toString('utf-8')))
     minecraft.stderr.on('data', (data) => this.emit('data', data.toString('utf-8')))
     minecraft.on('close', (code) => this.emit('close', code))
