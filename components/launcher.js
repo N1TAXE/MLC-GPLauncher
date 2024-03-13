@@ -181,7 +181,7 @@ class GPLCore extends EventEmitter {
       let modifyJson = null;
 
       if (this.options.forge) {
-        const url = `https://maven.minecraftforge.net/net/minecraftforge/forge/${this.options.version.number}-${this.options.forge}/forge-${this.options.version.number}-${this.options.forge}.jar`
+        const url = `https://maven.minecraftforge.net/net/minecraftforge/forge/${this.options.version.number}-${this.options.forge}/forge-${this.options.version.number}-${this.options.forge}-installer.jar`
         this.emit('debug', '[MCLC]: Detected Forge in options, getting dependencies')
 
         const response = await fetch(url)
