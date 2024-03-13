@@ -5,38 +5,38 @@ const fs = require('fs')
 const EventEmitter = require('events').EventEmitter
 
 class GPLCore extends EventEmitter {
-  async launch (options) {
-    try {
-      this.options = { ...options }
-      this.options.root = path.resolve(this.options.root)
-      this.options.overrides = {
-        detached: true,
-        ...this.options.overrides,
-        url: {
-          meta: 'https://launchermeta.mojang.com',
-          resource: 'https://resources.download.minecraft.net',
-          mavenForge: 'https://files.minecraftforge.net/maven/',
-          defaultRepoForge: 'https://libraries.minecraft.net/',
-          fallbackMaven: 'https://search.maven.org/remotecontent?filepath=',
-          ...this.options.overrides
+  async init(options){
+    this.options = { ...options }
+    this.options.root = path.resolve(this.options.root)
+    this.options.overrides = {
+      detached: true,
+      ...this.options.overrides,
+      url: {
+        meta: 'https://launchermeta.mojang.com',
+        resource: 'https://resources.download.minecraft.net',
+        mavenForge: 'https://files.minecraftforge.net/maven/',
+        defaultRepoForge: 'https://libraries.minecraft.net/',
+        fallbackMaven: 'https://search.maven.org/remotecontent?filepath=',
+        ...this.options.overrides
             ? this.options.overrides.url
             : undefined
-        },
-        fw: {
-          baseUrl: 'https://github.com/ZekerZhayard/ForgeWrapper/releases/download/',
-          version: '1.6.0',
-          sh1: '035a51fe6439792a61507630d89382f621da0f1f',
-          size: 28679,
-          ...this.options.overrides
+      },
+      fw: {
+        baseUrl: 'https://github.com/ZekerZhayard/ForgeWrapper/releases/download/',
+        version: '1.6.0',
+        sh1: '035a51fe6439792a61507630d89382f621da0f1f',
+        size: 28679,
+        ...this.options.overrides
             ? this.options.overrides.fw
             : undefined
-        }
       }
+    }
 
-      this.handler = new Handler(this)
-
-      this.printVersion()
-
+    this.handler = new Handler(this)
+    this.printVersion()
+  }
+  async launch () {
+    try {
       const java = await this.handler.checkJava(this.options.javaPath || 'java')
       if (!java.run) {
         this.emit('debug', `[MCLC]: Couldn't start Minecraft due to: ${java.message}`)
