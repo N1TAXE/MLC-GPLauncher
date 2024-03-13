@@ -176,19 +176,28 @@ class GPLCore extends EventEmitter {
     }
   }
 
-  async getModifyJson () {
-    let modifyJson = null
+  async getModifyJson() {
+    let modifyJson = null;
 
     if (this.options.forge) {
-      this.options.forge = path.resolve(this.options.forge)
+      const url = `https://maven.minecraftforge.net/net/minecraftforge/forge/${this.options.version.number}-${this.options.forge}/forge-${this.options.version.number}-${this.options.forge}.jar`
       this.emit('debug', '[MCLC]: Detected Forge in options, getting dependencies')
+
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Forge file from ${url}`)
+      }
+      const modloadersDir = path.resolve(path.join(this.options.root, 'modloaders'))
+      await this.downloadAsync(url, modloadersDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'mod-loader')
+      this.options.forge = path.resolve(`${modloadersDir}/forge-${this.options.version.number}-${this.options.forge}.jar`)
+
       modifyJson = await this.handler.getForgedWrapped()
     } else if (this.options.version.custom) {
-      this.emit('debug', '[MCLC]: Detected custom in options, setting custom version file')
-      modifyJson = modifyJson || JSON.parse(fs.readFileSync(path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.json`), { encoding: 'utf8' }))
+      this.emit('debug', '[MCLC]: Detected custom in options, setting custom version file');
+      modifyJson = modifyJson || JSON.parse(await fs.readFile(path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.json`), { encoding: 'utf8' }));
     }
 
-    return modifyJson
+    return modifyJson;
   }
 
   startMinecraft (launchArguments) {
