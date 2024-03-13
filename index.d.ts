@@ -296,7 +296,7 @@ declare module "gpl-core" {
 
   export class Client extends EventEmitter {
     launch(options: ILauncherOptions): Promise<ChildProcessWithoutNullStreams | null>;
-    checkIfVersionDownloaded(): boolean;
+    checkIfVersionDownloaded(): Promise<boolean>;
     protected printVersion(): void;
     protected createRootDirectory(): void;
     protected createGameDirectory(): void;
