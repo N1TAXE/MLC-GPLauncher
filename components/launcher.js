@@ -186,7 +186,7 @@ class GPLCore extends EventEmitter {
       const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
       const filesInFolder = fs.readdirSync(modsFolder);
 
-      await Promise.all(modList.map(async (mod, i) => {
+      modList.map(async (mod, i) => {
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
         const response = await fetch(url);
 
@@ -206,7 +206,7 @@ class GPLCore extends EventEmitter {
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
           await this.handler.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
         }
-      }));
+      })
     } catch (e) {
       console.log(e)
     }
