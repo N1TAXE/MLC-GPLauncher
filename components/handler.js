@@ -205,7 +205,7 @@ class Handler {
     }
   }
 
-  async getAssets () {
+  async getAssets (dist) {
     const assetDirectory = path.resolve(this.options.overrides.assetRoot || path.join(this.options.root, 'assets'))
     const assetId = this.options.version.custom || this.options.version.number
     if (!fs.existsSync(path.join(assetDirectory, 'indexes', `${assetId}.json`))) {
@@ -280,6 +280,7 @@ class Handler {
     counter = 0
 
     this.client.emit('debug', '[MCLC]: Downloaded assets')
+    await this.getMods(dist)
   }
 
   parseRule (lib) {
@@ -387,7 +388,7 @@ class Handler {
     }
   }
 
-  async getForgedWrapped (dist) {
+  async getForgedWrapped () {
     let json = null
     let installerJson = null
     const versionPath = path.join(this.options.root, 'forge', `${this.version.id}`, 'version.json')
@@ -528,7 +529,6 @@ class Handler {
 
     // Make MCLC treat modern forge as a custom version json rather then legacy forge.
     if (this.isModernForge(json)) this.options.forge = null
-    await this.getMods(dist)
     return json
   }
 
