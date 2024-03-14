@@ -189,6 +189,7 @@ class GPLCore extends EventEmitter {
       await Promise.all(modList.map(async (mod, i) => {
         const url = `${api}/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
         const response = await fetch(url);
+        console.log(response)
         const currentMod = response.data[0];
         const fileURL = currentMod.files[0].url;
         const fileName = currentMod.files[0].filename;
