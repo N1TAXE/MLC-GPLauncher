@@ -183,7 +183,7 @@ class GPLCore extends EventEmitter {
       if (!this.dist.mods || !this.dist.forge) return
       const modList = this.dist.mods
       const api = 'https://api.modrinth.com/v2'
-      const modsFolder = path.resolve(path.join(this.options.gameDirectory, 'mods'))
+      const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
       const filesInFolder = fs.readdirSync(modsFolder);
 
       await Promise.all(modList.map(async (mod, i) => {
