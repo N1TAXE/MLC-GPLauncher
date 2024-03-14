@@ -189,9 +189,8 @@ class GPLCore extends EventEmitter {
       await Promise.all(modList.map(async (mod, i) => {
         const url = `${api}/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
         const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch mod data: ${response.statusText}`);
-        }
+        console.log(url)
+        console.log(response)
 
         const currentMod = await response.json();
         const fileURL = currentMod[0].files[0].url;
