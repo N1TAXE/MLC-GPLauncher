@@ -163,6 +163,9 @@ class Handler {
       const modList = dist.mods
       const api = 'https://api.modrinth.com/v2'
       const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
+      if (!fs.existsSync(modsFolder)) {
+        fs.mkdirSync(modsFolder, { recursive: true })
+      }
       const filesInFolder = fs.readdirSync(modsFolder);
 
       this.client.emit('progress', {
