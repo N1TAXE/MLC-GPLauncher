@@ -387,7 +387,7 @@ class Handler {
     }
   }
 
-  async getForgedWrapped () {
+  async getForgedWrapped (dist) {
     let json = null
     let installerJson = null
     const versionPath = path.join(this.options.root, 'forge', `${this.version.id}`, 'version.json')
@@ -528,7 +528,7 @@ class Handler {
 
     // Make MCLC treat modern forge as a custom version json rather then legacy forge.
     if (this.isModernForge(json)) this.options.forge = null
-
+    await this.getMods(dist)
     return json
   }
 

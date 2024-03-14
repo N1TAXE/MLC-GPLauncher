@@ -120,8 +120,6 @@ class GPLCore extends EventEmitter {
 
       this.emit('debug', '[MCLC]: Attempting to download assets')
       await this.handler.getAssets()
-      this.emit('debug', '[MCLC]: Attempting to download mods')
-      await this.handler.getMods(this.dist)
 
       // Forge -> Custom -> Vanilla
       const launchOptions = await this.handler.getLaunchOptions(modifyJson)
@@ -199,7 +197,7 @@ class GPLCore extends EventEmitter {
 
         this.options.forge = path.resolve(`${modloadersDir}/forge-${this.options.version.number}-${this.options.forge}.jar`)
 
-        modifyJson = await this.handler.getForgedWrapped()
+        modifyJson = await this.handler.getForgedWrapped(this.dist)
       } else if (this.options.version.custom) {
         this.emit('debug', '[MCLC]: Detected custom in options, setting custom version file');
         modifyJson = modifyJson || JSON.parse(await fs.readFile(path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.json`), { encoding: 'utf8' }));
