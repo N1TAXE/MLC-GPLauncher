@@ -186,16 +186,16 @@ class GPLCore extends EventEmitter {
       const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
       const filesInFolder = fs.readdirSync(modsFolder);
 
-      modList.map(async (mod, i) => {
-        console.log(mod)
+      await Promise.all(modList.map(async (mod, i) => {
         const url = `${api}/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
-        console.log(url)
         const response = await fetch(url);
-        console.log(response)
-        const currentMod = response.data[0];
-        console.log(currentMod)
-        const fileURL = currentMod.files[0].url;
-        const fileName = currentMod.files[0].filename;
+        if (!response.ok) {
+          throw new Error(`Failed to fetch mod data: ${response.statusText}`);
+        }
+
+        const currentMod = await response.json();
+        const fileURL = currentMod[0].files[0].url;
+        const fileName = currentMod[0].files[0].filename;
         const modFileNameData = this.handler.getModFileName(fileName);
 
         const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
@@ -208,7 +208,7 @@ class GPLCore extends EventEmitter {
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
           await this.handler.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
         }
-      });
+      }));
     } catch (e) {
       console.log(e)
     }
