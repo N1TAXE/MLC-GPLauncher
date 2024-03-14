@@ -191,6 +191,7 @@ class GPLCore extends EventEmitter {
         const response = await fetch(url);
 
         const currentMod = await response.json();
+        console.log(currentMod)
         const fileURL = currentMod[0].files[0].url;
         const fileName = currentMod[0].files[0].filename;
         const modFileNameData = this.handler.getModFileName(fileName);
