@@ -157,6 +157,47 @@ class Handler {
     return this.client.emit('debug', '[MCLC]: Downloaded version jar and wrote version json')
   }
 
+  async getMods(dist) {
+    try {
+      if (!dist.mods || !dist.forge) return
+      const modList = dist.mods
+      const api = 'https://api.modrinth.com/v2'
+      const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
+      const filesInFolder = fs.readdirSync(modsFolder);
+
+      await Promise.all(modList.map(async (mod, i) => {
+        const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+        const response = await fetch(url);
+
+        const currentMod = await response.json();
+        const fileURL = currentMod[0].files[0].url;
+        const fileName = currentMod[0].files[0].filename;
+        const modFileNameData = this.getModFileName(fileName);
+
+        const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
+
+        if (fileMatch && fileMatch !== fileName) {
+          const filePath = path.join(modsFolder, fileMatch);
+          await fs.promises.unlink(filePath);
+        }
+
+        if (!fs.existsSync(path.join(modsFolder, fileName))) {
+          await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
+        }
+        counter++
+        this.client.emit('progress', {
+          type: 'mods',
+          task: counter,
+          total: modList.length
+        })
+      }))
+      counter = 0
+      this.client.emit('debug', '[MCLC]: Downloaded mods')
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   async getAssets () {
     const assetDirectory = path.resolve(this.options.overrides.assetRoot || path.join(this.options.root, 'assets'))
     const assetId = this.options.version.custom || this.options.version.number
