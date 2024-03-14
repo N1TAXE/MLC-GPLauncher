@@ -67,6 +67,7 @@ class GPLCore extends EventEmitter {
 
       const modifyJson = await this.getModifyJson()
       await this.getMods()
+      console.log('next')
 
       const args = []
 
@@ -179,6 +180,7 @@ class GPLCore extends EventEmitter {
   }
 
   async getMods() {
+    console.log('getMods')
     try {
       if (!this.dist.mods || !this.dist.forge) return
       const modList = this.dist.mods
@@ -187,11 +189,11 @@ class GPLCore extends EventEmitter {
       const filesInFolder = fs.readdirSync(modsFolder);
 
       modList.map(async (mod, i) => {
+        console.log(mod)
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
         const response = await fetch(url);
 
         const currentMod = await response.json();
-        console.log(currentMod)
         const fileURL = currentMod[0].files[0].url;
         const fileName = currentMod[0].files[0].filename;
         const modFileNameData = this.handler.getModFileName(fileName);
