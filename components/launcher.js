@@ -189,7 +189,7 @@ class GPLCore extends EventEmitter {
       await Promise.all(modList.map(async (mod, i) => {
         const url = `${api}/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
         const response = await fetch(url);
-        const currentMod = response[0];
+        const currentMod = response.data[0];
         const fileURL = currentMod.files[0].url;
         const fileName = currentMod.files[0].filename;
         const modFileNameData = this.handler.getModFileName(fileName);
@@ -202,7 +202,7 @@ class GPLCore extends EventEmitter {
         }
 
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
-          await this.handler.downloadAsync(fileURL, modsFolder, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'mod-loader')
+          await this.handler.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
         }
       }));
     } catch (e) {
