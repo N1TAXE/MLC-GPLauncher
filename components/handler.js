@@ -165,6 +165,12 @@ class Handler {
       const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
       const filesInFolder = fs.readdirSync(modsFolder);
 
+      this.client.emit('progress', {
+        type: 'mods',
+        task: 0,
+        total: modList.length
+      })
+
       await Promise.all(modList.map(async (mod, i) => {
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
         const response = await fetch(url);
