@@ -326,6 +326,19 @@ class Handler {
     return json.inheritsFrom && json.inheritsFrom.split('.')[1] >= 12 && !(json.inheritsFrom === '1.12.2' && (json.id.split('.')[json.id.split('.').length - 1]) === '2847')
   }
 
+  getModFileName(fileName) {
+    const regex = /^(.*)-(.*)-(.*)\.jar$/;
+    const match = fileName.match(regex);
+
+    if (match) {
+      const name = match[1];
+      const gameVersion = match[2];
+      const modVersion = match[3];
+
+      return {name, gameVersion, modVersion}
+    }
+  }
+
   async getForgedWrapped () {
     let json = null
     let installerJson = null

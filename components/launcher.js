@@ -66,6 +66,7 @@ class GPLCore extends EventEmitter {
       }
 
       const modifyJson = await this.getModifyJson()
+      await this.getMods()
 
       const args = []
 
@@ -174,6 +175,38 @@ class GPLCore extends EventEmitter {
     if (this.options.clientPackage) {
       this.emit('debug', `[MCLC]: Extracting client package to ${this.options.root}`)
       await this.handler.extractPackage()
+    }
+  }
+
+  async getMods() {
+    try {
+      if (!this.dist.mods || !this.dist.forge) return
+      const modList = this.dist.mods
+      const api = 'https://api.modrinth.com/v2'
+      const modsFolder = path.resolve(path.join(this.options.gameDirectory, 'mods'))
+      const filesInFolder = fs.readdirSync(modsFolder);
+
+      await Promise.all(modList.map(async (mod, i) => {
+        const url = `${api}/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
+        const response = await fetch(url);
+        const currentMod = response[0];
+        const fileURL = currentMod.files[0].url;
+        const fileName = currentMod.files[0].filename;
+        const modFileNameData = this.handler.getModFileName(fileName);
+
+        const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
+
+        if (fileMatch && fileMatch !== fileName) {
+          const filePath = path.join(modsFolder, fileMatch);
+          await fs.promises.unlink(filePath);
+        }
+
+        if (!fs.existsSync(path.join(modsFolder, fileName))) {
+          await this.handler.downloadAsync(fileURL, modsFolder, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'mod-loader')
+        }
+      }));
+    } catch (e) {
+      console.log(e)
     }
   }
 
