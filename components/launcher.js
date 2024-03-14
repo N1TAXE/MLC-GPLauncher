@@ -187,10 +187,8 @@ class GPLCore extends EventEmitter {
       const filesInFolder = fs.readdirSync(modsFolder);
 
       await Promise.all(modList.map(async (mod, i) => {
-        const url = `${api}/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
+        const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${this.dist.version}"]`;
         const response = await fetch(url);
-        console.log(url)
-        console.log(response)
 
         const currentMod = await response.json();
         const fileURL = currentMod[0].files[0].url;
