@@ -283,7 +283,7 @@ class Handler {
     counter = 0
 
     this.client.emit('debug', '[MCLC]: Downloaded assets')
-    await this.getMods(dist)
+    return await this.getMods(dist)
   }
 
   parseRule (lib) {
