@@ -171,7 +171,7 @@ class Handler {
         total: modList.length
       })
 
-      await Promise.all(modList.map(async (mod, i) => {
+      await Promise.all(modList.map(async mod => {
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
         const response = await fetch(url);
 
@@ -186,9 +186,10 @@ class Handler {
           const filePath = path.join(modsFolder, fileMatch);
           await fs.promises.unlink(filePath);
         }
+        console.log(`Downloading: ${fileName}`)
 
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
-          await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
+          await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod').finally(() => console.log(`${fileName}: Done`))
         }
         counter++
         this.client.emit('progress', {

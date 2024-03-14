@@ -66,7 +66,6 @@ class GPLCore extends EventEmitter {
       }
 
       const modifyJson = await this.getModifyJson()
-      await this.handler.getMods(this.dist)
 
       const args = []
 
@@ -121,6 +120,8 @@ class GPLCore extends EventEmitter {
 
       this.emit('debug', '[MCLC]: Attempting to download assets')
       await this.handler.getAssets()
+      this.emit('debug', '[MCLC]: Attempting to download mods')
+      await this.handler.getMods(this.dist)
 
       // Forge -> Custom -> Vanilla
       const launchOptions = await this.handler.getLaunchOptions(modifyJson)
@@ -128,6 +129,7 @@ class GPLCore extends EventEmitter {
       const launchArguments = args.concat(jvm, classPaths, launchOptions)
       this.emit('arguments', launchArguments)
       this.emit('debug', `[MCLC]: Launching with arguments ${launchArguments.join(' ')}`)
+
 
       return this.startMinecraft(launchArguments)
     } catch (e) {
