@@ -168,30 +168,23 @@ class Handler {
       }
       const filesInFolder = fs.readdirSync(modsFolder);
       let modList = [];
-      console.log(distModList)
       await Promise.all(distModList.map(async mod => {
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
         const response = await fetch(url);
         const currentMod = await response.json();
-        console.log('response:' + response)
-        console.log('currentMod:' + currentMod)
-        console.log('currentMod[0]:' +  currentMod[0])
         if (currentMod || currentMod.length > 0) return modList = [...modList, currentMod[0]]
       }))
 
       async function processDependencies(mod) {
-        console.log(modList)
-        console.log(mod)
         if (mod.dependencies || mod.dependencies.length > 0) {
           await Promise.all(mod.dependencies.map(async dependency => {
-            if (dependency.dependency_type === 'required') {
+            if (dependency.dependency_type === 'required' && !modList.some(existingMod => existingMod.project_id === dependency.project_id)) {
               const url = `${api}/project/${dependency.project_id}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
               const response = await fetch(url);
-              if (!modList.some(existingMod => existingMod.project_id === response.project_id)) {
-                modList.push(response[0]);
-                // Рекурсивно обрабатываем зависимости этой зависимости
-                await processDependencies(response[0]);
-              }
+              const currentMod = await response.json();
+              modList.push(currentMod[0]);
+              // Рекурсивно обрабатываем зависимости этой зависимости
+              await processDependencies(currentMod[0]);
             }
           }));
         }
