@@ -172,8 +172,7 @@ class Handler {
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
         const response = await fetch(url);
         const currentMod = await response.json();
-        console.log(currentMod)
-        if (response || response.length > 0) {
+        if (currentMod.length > 0) {
           return modList = [...modList, currentMod[0]]
         }
       }))
