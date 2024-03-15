@@ -208,7 +208,7 @@ class Handler {
     }
   }
 
-  async getAssets (dist) {
+  async getAssets () {
     const assetDirectory = path.resolve(this.options.overrides.assetRoot || path.join(this.options.root, 'assets'))
     const assetId = this.options.version.custom || this.options.version.number
     if (!fs.existsSync(path.join(assetDirectory, 'indexes', `${assetId}.json`))) {
@@ -283,7 +283,6 @@ class Handler {
     counter = 0
 
     this.client.emit('debug', '[MCLC]: Downloaded assets')
-    return await this.getMods(dist)
   }
 
   parseRule (lib) {

@@ -47,6 +47,7 @@ class GPLCore extends EventEmitter {
 
       this.createRootDirectory()
       this.createGameDirectory()
+      await this.handler.getMods(this.dist)
 
       await this.extractPackage()
 
@@ -119,16 +120,15 @@ class GPLCore extends EventEmitter {
       classPaths.push(file.mainClass)
 
       this.emit('debug', '[MCLC]: Attempting to download assets')
-      await this.handler.getAssets(this.dist).finally(async () => {
-        // Forge -> Custom -> Vanilla
-        const launchOptions = await this.handler.getLaunchOptions(modifyJson)
+      await this.handler.getAssets(this.dist)
+      // Forge -> Custom -> Vanilla
+      const launchOptions = await this.handler.getLaunchOptions(modifyJson)
 
-        const launchArguments = args.concat(jvm, classPaths, launchOptions)
-        this.emit('arguments', launchArguments)
-        this.emit('debug', `[MCLC]: Launching with arguments ${launchArguments.join(' ')}`)
+      const launchArguments = args.concat(jvm, classPaths, launchOptions)
+      this.emit('arguments', launchArguments)
+      this.emit('debug', `[MCLC]: Launching with arguments ${launchArguments.join(' ')}`)
 
-        return this.startMinecraft(launchArguments)
-      })
+      return await this.startMinecraft(launchArguments)
     } catch (e) {
       this.emit('debug', `[MCLC]: Failed to start due to ${e}, closing...`)
       return null
