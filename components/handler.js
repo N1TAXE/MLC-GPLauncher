@@ -203,10 +203,8 @@ class Handler {
         task: 0,
         total: modList.length
       })
-      console.log("modlist length: " + modList.length)
-      console.log(modList)
       await Promise.all(modList.map(async mod => {
-        const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+        const url = `${api}/project/${mod.project_id}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
         const response = await fetch(url);
 
         const currentMod = await response.json();
