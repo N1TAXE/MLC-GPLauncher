@@ -176,6 +176,7 @@ class Handler {
       }))
 
       async function processDependencies(mod) {
+        console.log(mod)
         if (mod.dependencies || mod.dependencies.length > 0) {
           await Promise.all(mod.dependencies.map(async dependency => {
             if (dependency.dependency_type === 'required' && !modList.some(existingMod => existingMod.project_id === dependency.project_id)) {
