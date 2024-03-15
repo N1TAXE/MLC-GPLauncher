@@ -171,11 +171,13 @@ class Handler {
       await Promise.all(distModList.map(async mod => {
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
         const response = await fetch(url);
-        const currentMod = await response.json();
-        if (currentMod || currentMod.length > 0) return modList = [...modList, currentMod[0]]
+        console.log(response)
+        if (response || response.length > 0) {
+          const currentMod = await response.json();
+          return modList = [...modList, currentMod[0]]
+        }
       }))
 
-      console.log(modList)
 
       async function processDependencies(mod) {
         if (mod.dependencies || mod.dependencies.length > 0) {
