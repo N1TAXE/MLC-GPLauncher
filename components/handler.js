@@ -176,17 +176,19 @@ class Handler {
       }))
 
       async function processDependencies(mod) {
-        await Promise.all(mod.dependencies.map(async dependency => {
-          if (dependency.dependency_type === 'required') {
-            const url = `${api}/project/${dependency.project_id}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
-            const response = await fetch(url);
-            if (!modList.some(existingMod => existingMod.project_id === response.project_id)) {
-              modList.push(response[0]);
-              // Рекурсивно обрабатываем зависимости этой зависимости
-              await processDependencies(response[0]);
+        if (mod.dependencies || mod.dependencies.length > 0) {
+          await Promise.all(mod.dependencies.map(async dependency => {
+            if (dependency.dependency_type === 'required') {
+              const url = `${api}/project/${dependency.project_id}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+              const response = await fetch(url);
+              if (!modList.some(existingMod => existingMod.project_id === response.project_id)) {
+                modList.push(response[0]);
+                // Рекурсивно обрабатываем зависимости этой зависимости
+                await processDependencies(response[0]);
+              }
             }
-          }
-        }));
+          }));
+        }
       }
 
       // Перебираем моды в множестве для обработки их зависимостей
