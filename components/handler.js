@@ -168,12 +168,15 @@ class Handler {
       }
       const filesInFolder = fs.readdirSync(modsFolder);
       let modList = [];
-
+      console.log(distModList)
       await Promise.all(distModList.map(async mod => {
         const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
         const response = await fetch(url);
-        const candidate = response.json();
-        if (candidate || candidate[0].length > 0) return modList = [...modList, candidate[0]]
+        const currentMod = await response.json();
+        console.log(response)
+        console.log(currentMod)
+        console.log(currentMod[0])
+        if (currentMod || currentMod.length > 0) return modList = [...modList, currentMod[0]]
       }))
 
       async function processDependencies(mod) {
