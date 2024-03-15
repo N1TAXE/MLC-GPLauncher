@@ -119,7 +119,7 @@ class GPLCore extends EventEmitter {
       classPaths.push(file.mainClass)
 
       this.emit('debug', '[MCLC]: Attempting to download assets')
-      await this.handler.getAssets(this.dist).then(async () => {
+      await this.handler.getAssets(this.dist).finally(async () => {
         // Forge -> Custom -> Vanilla
         const launchOptions = await this.handler.getLaunchOptions(modifyJson)
 
