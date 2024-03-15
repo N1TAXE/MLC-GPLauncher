@@ -160,13 +160,39 @@ class Handler {
   async getMods(dist) {
     try {
       if (!dist.mods || !dist.forge) return
-      const modList = dist.mods
+      const distModList = dist.mods
       const api = 'https://api.modrinth.com/v2'
       const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
       if (!fs.existsSync(modsFolder)) {
         fs.mkdirSync(modsFolder, { recursive: true })
       }
       const filesInFolder = fs.readdirSync(modsFolder);
+      let modList = [];
+
+      await Promise.all(distModList.map(async mod => {
+        const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+        const response = await fetch(url);
+        return modList = [...modList, response[0]]
+      }))
+
+      async function processDependencies(mod) {
+        await Promise.all(mod.dependencies.map(async dependency => {
+          if (dependency.dependency_type === 'required') {
+            const url = `${api}/project/${dependency.project_id}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+            const response = await fetch(url);
+            if (!modList.some(existingMod => existingMod.project_id === response.project_id)) {
+              modList.push(response[0]);
+              // Рекурсивно обрабатываем зависимости этой зависимости
+              await processDependencies(response[0]);
+            }
+          }
+        }));
+      }
+
+      // Перебираем моды в множестве для обработки их зависимостей
+      for (const mod of modList) {
+        await processDependencies(mod);
+      }
 
       this.client.emit('progress', {
         type: 'mods',
@@ -202,6 +228,7 @@ class Handler {
         })
       }))
       counter = 0
+
       this.client.emit('debug', '[MCLC]: Downloaded mods')
     } catch (e) {
       console.log(e)
