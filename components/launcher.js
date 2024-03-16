@@ -172,8 +172,7 @@ class GPLCore extends EventEmitter {
       if (this.dependencies) {
         await this.handler.getModrinth(this.dist, this.dependencies, 'server/mods', 'mod', 'server').then(() => this.dependencies = [])
       }
-
-      const serverDir = path.join(this.options.root, 'server')
+      const serverDir = path.join(this.options.overrides.gameDirectory, 'server')
       if (!fs.existsSync(serverDir)) {
         fs.mkdirSync(serverDir, { recursive: true })
       }
@@ -181,10 +180,9 @@ class GPLCore extends EventEmitter {
       const forgeJarPath = path.join(serverDir, `forge-${this.options.version.number}-${this.options.forge}.jar`)
       if (!fs.existsSync(forgeJarPath)) {
         const forgeUrl = `https://maven.minecraftforge.net/net/minecraftforge/forge/${this.options.version.number}-${this.options.forge}/forge-${this.options.version.number}-${this.options.forge}-installer.jar`
-        await this.handler.downloadAsync(forgeUrl, serverDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'server-loader')
-        const child = require('child_process')
-        const installCommand = `${java.run} -jar ${forgeJarPath} --installServer`
-        child.execSync(installCommand, { cwd: serverDir })
+        await this.handler.downloadAsync(forgeUrl, serverDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'server-loader').then(() => {
+          this.runInstallerJar(forgeJarPath, serverDir)
+        })
       } else {
         this.emit('debug', `[MCLC]: Forge files already exist in the server directory. Skipping download.`)
       }
@@ -192,6 +190,25 @@ class GPLCore extends EventEmitter {
       this.emit('debug', `[MCLC]: Failed to start due to ${e}, closing...`)
       return null
     }
+  }
+
+  async runInstallerJar(forgeJarPath, serverDir) {
+    // Запуск установщика Forge
+    const installProcess = child.spawn('java', ['-jar', forgeJarPath, '--installServer'], { cwd: serverDir, detached: true });
+
+    // Отслеживание вывода процесса
+    installProcess.stdout.on('data', (data) => {
+      console.log(`stdout: ${data}`);
+    });
+
+    installProcess.stderr.on('data', (data) => {
+      console.error(`stderr: ${data}`);
+    });
+
+    // Обработка завершения процесса
+    installProcess.on('close', (code) => {
+      console.log(`child process exited with code ${code}`);
+    });
   }
 
   async checkIfVersionDownloaded(options, dist) {

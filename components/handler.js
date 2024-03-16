@@ -203,10 +203,10 @@ class Handler {
       })
       await Promise.all(modList.map(async mod => {
         if (side === 'server') {
-          const sideUrl = `${api}/project/${mod}`;
-          const response = await fetch(sideUrl);
-          const currentMod = await response.json();
-          if (currentMod[0].server_side === 'unsupported') return
+          const sideUrl = `${api}/project/${mod.project_id}`;
+          const sideRes = await fetch(sideUrl);
+          const sideMod = await sideRes.json();
+          if (sideMod.server_side === 'unsupported') return
         }
         const url = `${api}/project/${mod.project_id}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;
         const response = await fetch(url);
