@@ -137,11 +137,7 @@ class GPLCore extends EventEmitter {
 
   async checkIfVersionDownloaded() {
     try {
-      const directory = this.options.overrides.directory || path.join(this.options.root, 'versions', this.options.version.custom ? this.options.version.custom : this.options.version.number);
-      const mcPath = this.options.overrides.minecraftJar || (this.options.version.custom
-          ? path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.jar`)
-          : path.join(directory, `${this.options.version.number}.jar`));
-      return fs.existsSync(mcPath);
+      return fs.existsSync(path.join(this.options.root, 'versions', this.dist.version, `${this.dist.version}.jar`));
     } catch (error) {
       return false;
     }
