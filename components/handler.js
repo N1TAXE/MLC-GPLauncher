@@ -222,7 +222,6 @@ class Handler {
 
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
           await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
-          console.log('Download mod: ' + fileName)
         }
         counter++
         this.client.emit('progress', {
@@ -394,6 +393,7 @@ class Handler {
   }
 
   fwAddArgs () {
+    console.log('Run forge')
     const forgeWrapperAgrs = [
       `-Dforgewrapper.librariesDir=${path.resolve(this.options.overrides.libraryRoot || path.join(this.options.root, 'libraries'))}`,
       `-Dforgewrapper.installer=${this.options.forge}`,
