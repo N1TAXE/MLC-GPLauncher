@@ -212,16 +212,18 @@ class Handler {
         const fileName = currentMod[0].files[0].filename;
         const modFileNameData = this.getModFileName(fileName);
 
+        console.log(filesInFolder)
+        console.log(modFileNameData.name)
+
         const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
 
         if (fileMatch && fileMatch !== fileName) {
           const filePath = path.join(modsFolder, fileMatch);
           await fs.promises.unlink(filePath);
         }
-        console.log(`Downloading: ${fileName}`)
 
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
-          await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod').finally(() => console.log(`${fileName}: Done`))
+          await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
         }
         counter++
         this.client.emit('progress', {
