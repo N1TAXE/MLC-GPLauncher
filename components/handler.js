@@ -222,6 +222,7 @@ class Handler {
 
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
           await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
+          console.log('Download mod: ' + fileName)
         }
         counter++
         this.client.emit('progress', {
