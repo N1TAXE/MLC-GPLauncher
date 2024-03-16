@@ -212,14 +212,14 @@ class Handler {
         const fileName = currentMod[0].files[0].filename;
         const modFileNameData = this.getModFileName(fileName);
 
-        console.log(filesInFolder)
-        console.log(modFileNameData.name)
+        console.log(modFileNameData)
 
-        const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
-
-        if (fileMatch && fileMatch !== fileName) {
-          const filePath = path.join(modsFolder, fileMatch);
-          await fs.promises.unlink(filePath);
+        if (modFileNameData) {
+          const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
+          if (fileMatch && fileMatch !== fileName) {
+            const filePath = path.join(modsFolder, fileMatch);
+            await fs.promises.unlink(filePath);
+          }
         }
 
         if (!fs.existsSync(path.join(modsFolder, fileName))) {
