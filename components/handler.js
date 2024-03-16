@@ -212,8 +212,6 @@ class Handler {
         const fileName = currentMod[0].files[0].filename;
         const modFileNameData = this.getModFileName(fileName);
 
-        console.log(modFileNameData)
-
         if (modFileNameData) {
           const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
           if (fileMatch && fileMatch !== fileName) {
