@@ -52,19 +52,19 @@ class GPLCore extends EventEmitter {
       this.createGameDirectory()
 
       if (this.dist.mods && this.dist.forge) {
-        await this.handler.getModrinth(this.dist, this.dist.mods, 'mods', 'mod')
+        await this.handler.getModrinth(this.dist, this.dist.mods, 'mods', 'mod', 'client')
       }
 
       if (this.dist.resourcepacks) {
-        await this.handler.getModrinth(this.dist, this.dist.resourcepacks, 'resourcepacks', 'resourcepacks')
+        await this.handler.getModrinth(this.dist, this.dist.resourcepacks, 'resourcepacks', 'resourcepacks', 'client')
       }
 
       if (this.dist.shaders) {
-        await this.handler.getModrinth(this.dist, this.dist.shaders, 'shaderpacks', 'shaderpacks')
+        await this.handler.getModrinth(this.dist, this.dist.shaders, 'shaderpacks', 'shaderpacks', 'client')
       }
 
       if (this.dependencies) {
-        await this.handler.getModrinth(this.dist, this.dependencies, 'mods', 'mod').then(() => this.dependencies = [])
+        await this.handler.getModrinth(this.dist, this.dependencies, 'mods', 'mod', 'client').then(() => this.dependencies = [])
       }
 
       await this.extractPackage()
@@ -146,6 +146,48 @@ class GPLCore extends EventEmitter {
       this.emit('arguments', launchArguments)
       this.emit('debug', `[MCLC]: Launching with arguments ${launchArguments.join(' ')}`)
       return await this.startMinecraft(launchArguments)
+    } catch (e) {
+      this.emit('debug', `[MCLC]: Failed to start due to ${e}, closing...`)
+      return null
+    }
+  }
+
+  async downloadServer (options, dist) {
+    try {
+      await this.init(options, dist)
+      const java = await this.handler.checkJava(this.options.javaPath || 'java')
+      if (!java.run) {
+        this.emit('debug', `[MCLC]: Couldn't start Minecraft due to: ${java.message}`)
+        this.emit('close', 1)
+        return null
+      }
+
+      this.createRootDirectory()
+      this.createGameDirectory()
+
+      if (this.dist.mods && this.dist.forge) {
+        await this.handler.getModrinth(this.dist, this.dist.mods, 'server/mods', 'mod', 'server')
+      }
+
+      if (this.dependencies) {
+        await this.handler.getModrinth(this.dist, this.dependencies, 'server/mods', 'mod', 'server').then(() => this.dependencies = [])
+      }
+
+      const serverDir = path.join(this.options.root, 'server')
+      if (!fs.existsSync(serverDir)) {
+        fs.mkdirSync(serverDir, { recursive: true })
+      }
+
+      const forgeJarPath = path.join(serverDir, `forge-${this.options.version.number}-${this.options.forge}.jar`)
+      if (!fs.existsSync(forgeJarPath)) {
+        const forgeUrl = `https://maven.minecraftforge.net/net/minecraftforge/forge/${this.options.version.number}-${this.options.forge}/forge-${this.options.version.number}-${this.options.forge}-installer.jar`
+        await this.handler.downloadAsync(forgeUrl, serverDir, `forge-${this.options.version.number}-${this.options.forge}.jar`, true, 'server-loader')
+        const child = require('child_process')
+        const installCommand = `${java.run} -jar ${forgeJarPath} --installServer`
+        child.execSync(installCommand, { cwd: serverDir })
+      } else {
+        this.emit('debug', `[MCLC]: Forge files already exist in the server directory. Skipping download.`)
+      }
     } catch (e) {
       this.emit('debug', `[MCLC]: Failed to start due to ${e}, closing...`)
       return null

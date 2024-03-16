@@ -158,7 +158,7 @@ class Handler {
     return this.client.emit('debug', '[MCLC]: Downloaded version jar and wrote version json')
   }
 
-  async getModrinth(dist, fileList, folder, type) {
+  async getModrinth(dist, fileList, folder, type, side) {
     try {
       const api = 'https://api.modrinth.com/v2'
       const defaultFolder = path.resolve(path.join(this.options.overrides.gameDirectory, folder))
@@ -202,6 +202,12 @@ class Handler {
         total: modList.length
       })
       await Promise.all(modList.map(async mod => {
+        if (side === 'server') {
+          const sideUrl = `${api}/project/${mod}`;
+          const response = await fetch(sideUrl);
+          const currentMod = await response.json();
+          if (currentMod[0].server_side === 'unsupported') return
+        }
         const url = `${api}/project/${mod.project_id}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;
         const response = await fetch(url);
 
