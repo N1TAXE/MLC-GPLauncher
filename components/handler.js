@@ -9,6 +9,7 @@ let counter = 0
 class Handler {
   constructor (client) {
     this.client = client
+    this.dependencies = client.dependencies
     this.options = client.options
     this.baseRequest = request.defaults({
       pool: { maxSockets: this.options.overrides.maxSockets || 2 },
@@ -175,17 +176,16 @@ class Handler {
         }
       }))
 
-      async function processDependencies(mod) {
+      async function processDependencies(mod, dependencies) {
         if (mod.dependencies || mod.dependencies.length > 0) {
           await Promise.all(mod.dependencies.map(async dependency => {
             if (dependency.dependency_type === 'required' && !modList.some(existingMod => existingMod.project_id === dependency.project_id)) {
               const url = `${api}/project/${dependency.project_id}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;
               const response = await fetch(url);
               const currentMod = await response.json();
-              console.log(this.dependencies)
-              this.dependencies.push(currentMod[0]);
+              if (!dependencies.includes(dependency.project_id)) dependencies.push(currentMod[0].project_id);
               // Рекурсивно обрабатываем зависимости этой зависимости
-              await processDependencies(currentMod[0]);
+              await processDependencies(currentMod[0], dependencies);
             }
           }));
         }
@@ -193,7 +193,7 @@ class Handler {
 
       // Перебираем моды в множестве для обработки их зависимостей
       for (const mod of modList) {
-        await processDependencies(mod);
+        await processDependencies(mod, this.dependencies);
       }
 
       this.client.emit('progress', {
