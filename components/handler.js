@@ -434,7 +434,6 @@ class Handler {
         } else {
           // If forge is modern, add ForgeWrappers launch arguments and set forge to null so MCLC treats it as a custom json.
           if (this.isModernForge(json)) {
-            console.log('first')
             this.fwAddArgs()
             this.options.forge = null
           }
@@ -471,7 +470,6 @@ class Handler {
     if (this.isModernForge(json)) {
       // If forge is modern and above 1.12.2, we add ForgeWrapper to the libraries so MCLC includes it in the classpaths.
       if (json.inheritsFrom !== '1.12.2') {
-        console.log('second')
         this.fwAddArgs()
         const fwName = `ForgeWrapper-${this.options.overrides.fw.version}.jar`
         const fwPathArr = ['io', 'github', 'zekerzhayard', 'ForgeWrapper', this.options.overrides.fw.version]

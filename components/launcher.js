@@ -182,6 +182,7 @@ class GPLCore extends EventEmitter {
       let modifyJson = null;
 
       if (this.options.forge) {
+        console.log('first')
         const url = `https://maven.minecraftforge.net/net/minecraftforge/forge/${this.options.version.number}-${this.options.forge}/forge-${this.options.version.number}-${this.options.forge}-installer.jar`
         this.emit('debug', '[MCLC]: Detected Forge in options, getting dependencies')
 
@@ -198,6 +199,7 @@ class GPLCore extends EventEmitter {
 
         modifyJson = await this.handler.getForgedWrapped()
       } else if (this.options.version.custom) {
+        console.log('second')
         this.emit('debug', '[MCLC]: Detected custom in options, setting custom version file');
         modifyJson = modifyJson || JSON.parse(await fs.readFile(path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.json`), { encoding: 'utf8' }));
       }
