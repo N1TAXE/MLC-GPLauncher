@@ -196,7 +196,7 @@ class GPLCore extends EventEmitter {
 
         this.options.forge = path.resolve(`${modloadersDir}/forge-${this.options.version.number}-${this.options.forge}.jar`)
 
-        modifyJson = await this.handler.getForgedWrapped(this.dist)
+        modifyJson = await this.handler.getForgedWrapped()
       } else if (this.options.version.custom) {
         this.emit('debug', '[MCLC]: Detected custom in options, setting custom version file');
         modifyJson = modifyJson || JSON.parse(await fs.readFile(path.join(this.options.root, 'versions', this.options.version.custom, `${this.options.version.custom}.json`), { encoding: 'utf8' }));
