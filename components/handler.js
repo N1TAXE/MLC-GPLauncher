@@ -238,7 +238,7 @@ class Handler {
 
       this.client.emit('debug', '[MCLC]: Downloaded mods')
     } catch (e) {
-      console.log(e)
+      throw new Error(e)
     }
   }
 
