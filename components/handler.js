@@ -157,19 +157,17 @@ class Handler {
     return this.client.emit('debug', '[MCLC]: Downloaded version jar and wrote version json')
   }
 
-  async getMods(dist) {
+  async getModrinth(dist, fileList, folder, type) {
     try {
-      if (!dist.mods || !dist.forge) return
-      const distModList = dist.mods
       const api = 'https://api.modrinth.com/v2'
-      const modsFolder = path.resolve(path.join(this.options.overrides.gameDirectory, 'mods'))
-      if (!fs.existsSync(modsFolder)) {
-        fs.mkdirSync(modsFolder, { recursive: true })
+      const defaultFolder = path.resolve(path.join(this.options.overrides.gameDirectory, folder))
+      if (!fs.existsSync(defaultFolder)) {
+        fs.mkdirSync(defaultFolder, { recursive: true })
       }
-      const filesInFolder = fs.readdirSync(modsFolder);
+      const filesInFolder = fs.readdirSync(defaultFolder);
       let modList = [];
-      await Promise.all(distModList.map(async mod => {
-        const url = `${api}/project/${mod}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+      await Promise.all(fileList.map(async mod => {
+        const url = `${api}/project/${mod}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;
         const response = await fetch(url);
         const currentMod = await response.json();
         if (currentMod.length > 0) {
@@ -177,15 +175,15 @@ class Handler {
         }
       }))
 
-
       async function processDependencies(mod) {
         if (mod.dependencies || mod.dependencies.length > 0) {
           await Promise.all(mod.dependencies.map(async dependency => {
             if (dependency.dependency_type === 'required' && !modList.some(existingMod => existingMod.project_id === dependency.project_id)) {
-              const url = `${api}/project/${dependency.project_id}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+              const url = `${api}/project/${dependency.project_id}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;
               const response = await fetch(url);
               const currentMod = await response.json();
-              modList.push(currentMod[0]);
+              console.log(this.dependencies)
+              this.dependencies.push(currentMod[0]);
               // Рекурсивно обрабатываем зависимости этой зависимости
               await processDependencies(currentMod[0]);
             }
@@ -204,7 +202,7 @@ class Handler {
         total: modList.length
       })
       await Promise.all(modList.map(async mod => {
-        const url = `${api}/project/${mod.project_id}/version?loaders=["forge"]&game_versions=["${dist.version}"]`;
+        const url = `${api}/project/${mod.project_id}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;
         const response = await fetch(url);
 
         const currentMod = await response.json();
@@ -215,13 +213,13 @@ class Handler {
         if (modFileNameData) {
           const fileMatch = filesInFolder.find(file => file.includes(modFileNameData.name));
           if (fileMatch && fileMatch !== fileName) {
-            const filePath = path.join(modsFolder, fileMatch);
+            const filePath = path.join(defaultFolder, fileMatch);
             await fs.promises.unlink(filePath);
           }
         }
 
-        if (!fs.existsSync(path.join(modsFolder, fileName))) {
-          await this.downloadAsync(fileURL, modsFolder, fileName, true, 'mod')
+        if (!fs.existsSync(path.join(defaultFolder, fileName))) {
+          await this.downloadAsync(fileURL, defaultFolder, fileName, true, 'mod')
         }
         counter++
         this.client.emit('progress', {

@@ -12,6 +12,8 @@ declare module "gpl-core" {
     }
     name: string;
     mods: string[];
+    shaders: string[];
+    resourcepacks: string[];
   }
 
   interface ModTypes {
@@ -332,8 +334,7 @@ declare module "gpl-core" {
   import { ChildProcessWithoutNullStreams } from 'child_process'
 
   export class Client extends EventEmitter {
-    init(options: ILauncherOptions, dist: DistTypes): Promise<ChildProcessWithoutNullStreams | null>;
-    launch(): Promise<ChildProcessWithoutNullStreams | null>;
+    launch(options: ILauncherOptions, dist: DistTypes): Promise<ChildProcessWithoutNullStreams | null>;
     checkIfVersionDownloaded(): Promise<boolean>;
     protected printVersion(): void;
     protected createRootDirectory(): void;
