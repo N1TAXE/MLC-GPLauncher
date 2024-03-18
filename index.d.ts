@@ -106,10 +106,10 @@ declare module "gpl-core" {
        * 
        */
       fallbackMaven?: string;
+      /**
+       * for Forge only, you need to redefine the library url in the version json.
+       */
     };
-    /**
-     * Version of the ForgeWrapper which MCLC uses. This allows us to launch modern Forge.
-     */
     fw?: {
       baseUrl?: string;
       version?: string;
@@ -117,6 +117,10 @@ declare module "gpl-core" {
       size?: number;
     };
     logj4ConfigurationFile?: string;
+    /**
+     * Overwrites game lang settings
+     */
+    gameLang?: string;
   }
 
   interface ILauncherOptions {

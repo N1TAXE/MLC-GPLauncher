@@ -101,6 +101,8 @@ class GPLCore extends EventEmitter {
         if (parseInt(versionFile.id.split('.')[1]) > 12) jvm.push(await this.handler.getJVM())
       } else jvm.push(await this.handler.getJVM())
 
+      if (this.options.overrides.gameLang) jvm.push(`--language ${this.options.overrides.gameLang}_${this.options.overrides.gameLang.toUpperCase()}`)
+
       if (this.options.customArgs) jvm = jvm.concat(this.options.customArgs)
       if (this.options.overrides.logj4ConfigurationFile) {
         jvm.push(`-Dlog4j.configurationFile=${path.resolve(this.options.overrides.logj4ConfigurationFile)}`)
