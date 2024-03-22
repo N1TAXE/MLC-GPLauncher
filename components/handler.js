@@ -4,6 +4,7 @@ const request = require('request')
 const checksum = require('checksum')
 const Zip = require('adm-zip')
 const child = require('child_process')
+const njre = require("njre");
 let counter = 0
 
 class Handler {
@@ -21,10 +22,18 @@ class Handler {
     return new Promise(resolve => {
       child.exec(`"${java}" -version`, (error, stdout, stderr) => {
         if (error) {
-          resolve({
-            run: false,
-            message: error
-          })
+          njre.install(17)
+              .then(dir => {
+                resolve({
+                  run: true
+                })
+              })
+              .catch(err => {
+                resolve({
+                  run: false,
+                  message: err
+                })
+              })
         } else {
           this.client.emit('debug', `[MCLC]: Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
           resolve({

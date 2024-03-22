@@ -3,6 +3,7 @@ const path = require('path')
 const Handler = require('./handler')
 const fs = require('fs')
 const EventEmitter = require('events').EventEmitter
+const njre = require('njre')
 
 class GPLCore extends EventEmitter {
 
@@ -41,12 +42,7 @@ class GPLCore extends EventEmitter {
   async launch (options, dist) {
     try {
       await this.init(options, dist)
-      const java = await this.handler.checkJava(this.options.javaPath || 'java')
-      if (!java.run) {
-        this.emit('debug', `[MCLC]: Couldn't start Minecraft due to: ${java.message}`)
-        this.emit('close', 1)
-        return null
-      }
+      await this.handler.checkJava(this.options.javaPath || 'java')
 
       this.createRootDirectory()
       this.createGameDirectory()
@@ -100,8 +96,6 @@ class GPLCore extends EventEmitter {
       if (this.handler.getOS() === 'osx') {
         if (parseInt(versionFile.id.split('.')[1]) > 12) jvm.push(await this.handler.getJVM())
       } else jvm.push(await this.handler.getJVM())
-
-      if (this.options.overrides.gameLang) jvm.push(`--language ${this.options.overrides.gameLang}_${this.options.overrides.gameLang.toUpperCase()}`)
 
       if (this.options.customArgs) jvm = jvm.concat(this.options.customArgs)
       if (this.options.overrides.logj4ConfigurationFile) {
