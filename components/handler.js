@@ -215,7 +215,7 @@ class Handler {
           const sideUrl = `${api}/project/${mod.project_id}`;
           const sideRes = await fetch(sideUrl);
           const sideMod = await sideRes.json();
-          if (sideMod.server_side === 'unsupported') return
+          if (sideMod.server_side === 'unsupported' && !dist.server.modexceptions.includes(mod.slug)) return
         }
         const url = `${api}/project/${mod.project_id}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;
         const response = await fetch(url);

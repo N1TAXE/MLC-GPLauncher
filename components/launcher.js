@@ -163,9 +163,6 @@ class GPLCore extends EventEmitter {
 
       if (this.dist.mods && this.dist.forge) {
         await this.handler.getModrinth(this.dist, this.dist.mods, 'server/mods', 'mod', 'server')
-        if (this.dist.server.modexceptions) {
-          await this.handler.getModrinth(this.dist, this.dist.server.modexceptions, 'server/mods', 'mod', 'server')
-        }
       }
 
       if (this.dependencies) {
