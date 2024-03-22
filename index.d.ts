@@ -9,6 +9,7 @@ declare module "gpl-core" {
     "server": {
       "address": string;
       "port": string;
+      "modexceptions": string[]
     }
     name: string;
     mods: string[];
