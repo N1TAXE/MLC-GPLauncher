@@ -187,21 +187,18 @@ class Handler {
     return this.client.emit('debug', '[MCLC]: Downloaded version jar and wrote version json')
   }
 
-  isDeepEqual(obj1, obj2) {
-    const keys1 = Object.keys(obj1);
-    const keys2 = Object.keys(obj2);
-
-    if (keys1.length !== keys2.length) {
-      return false;
+  isDeepEqual(oldObj, newObj) {
+    const oldKeys = Object.keys(oldObj);
+    const newKeys = Object.keys(newObj);
+    if (oldKeys.length !== newKeys.length) {
+      return true;
     }
-
-    for (const key of keys1) {
-      if (!keys2.includes(key) || !this.isDeepEqual(obj1[key], obj2[key])) {
-        return false;
+    for (const key of newKeys) {
+      if (!(key in oldObj) || oldObj[key] !== newObj[key]) {
+        return true;
       }
     }
-
-    return true;
+    return false;
   }
 
   async getModrinth(dist, fileList, folder, type, side) {
