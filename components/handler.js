@@ -45,7 +45,7 @@ class Handler {
   }
 
   async installJava() {
-    install(8)
+    return install(8)
   }
 
   downloadAsync (url, directory, name, retry, type) {
