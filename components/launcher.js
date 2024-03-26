@@ -3,7 +3,6 @@ const path = require('path')
 const Handler = require('./handler')
 const fs = require('fs')
 const EventEmitter = require('events').EventEmitter
-const njre = require('njre')
 
 class GPLCore extends EventEmitter {
 
