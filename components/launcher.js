@@ -42,6 +42,10 @@ class GPLCore extends EventEmitter {
     const java = await this.handler.checkJava()
     return java.run
   }
+
+  async installJava() {
+    return this.handler.installJava()
+  }
   async launch (options, dist, store) {
     try {
       await this.init(options, dist)
