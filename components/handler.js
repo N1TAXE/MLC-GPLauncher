@@ -4,7 +4,7 @@ const request = require('request')
 const checksum = require('checksum')
 const Zip = require('adm-zip')
 const child = require('child_process')
-const njre = require("njre");
+const {install} = require("./install")
 let counter = 0
 
 class Handler {
@@ -18,26 +18,46 @@ class Handler {
     })
   }
 
-  checkJava (java) {
+  checkJava (gameRoot) {
     return new Promise(resolve => {
-      child.exec(`"${java}" -version`, (error, stdout, stderr) => {
+      child.exec(`java -version`, (error, stdout, stderr) => {
         if (error) {
-          njre.install(17)
-              .then(dir => {
+          try {
+            child.exec(`"${gameRoot}/jre/bin/java.exe" -version`, (err, stdout, stderr) => {
+              if (err) {
+                install(17)
+                    .then(dir => {
+                      this.client.emit('debug', `[MCLC]: Dir: ${dir} - Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
+                      resolve({
+                        run: true,
+                        javapath: `${gameRoot}/jre/bin/java.exe`
+                      })
+                    })
+                    .catch(err => {
+                      resolve({
+                        run: false,
+                        message: err
+                      })
+                    })
+              } else {
+                this.client.emit('debug', `[MCLC]: Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
                 resolve({
-                  run: true
+                  run: true,
+                  javapath: `${gameRoot}/jre/bin/java.exe`
                 })
-              })
-              .catch(err => {
-                resolve({
-                  run: false,
-                  message: err
-                })
-              })
+              }
+            })
+          } catch (e) {
+            resolve({
+              run: false,
+              message: e
+            })
+          }
         } else {
           this.client.emit('debug', `[MCLC]: Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
           resolve({
-            run: true
+            run: true,
+            javapath: 'java'
           })
         }
       })
@@ -167,6 +187,23 @@ class Handler {
     return this.client.emit('debug', '[MCLC]: Downloaded version jar and wrote version json')
   }
 
+  isDeepEqual(obj1, obj2) {
+    const keys1 = Object.keys(obj1);
+    const keys2 = Object.keys(obj2);
+
+    if (keys1.length !== keys2.length) {
+      return false;
+    }
+
+    for (const key of keys1) {
+      if (!keys2.includes(key) || !this.isDeepEqual(obj1[key], obj2[key])) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   async getModrinth(dist, fileList, folder, type, side) {
     try {
       const api = 'https://api.modrinth.com/v2'
@@ -215,6 +252,7 @@ class Handler {
           const sideUrl = `${api}/project/${mod.project_id}`;
           const sideRes = await fetch(sideUrl);
           const sideMod = await sideRes.json();
+          this.client.emit('debug', `isModExcept: ${dist.server.modexceptions.includes(mod.slug)}`)
           if (sideMod.server_side === 'unsupported' && !dist.server.modexceptions.includes(mod.slug)) return
         }
         const url = `${api}/project/${mod.project_id}/version?${type === 'mod' ? 'loaders=["forge"]&' : null}game_versions=["${dist.version}"]`;

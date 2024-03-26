@@ -39,28 +39,33 @@ class GPLCore extends EventEmitter {
     this.handler = new Handler(this)
     this.printVersion()
   }
-  async launch (options, dist) {
+  async checkJava(gameRoot){
+    const java = await this.handler.checkJava(gameRoot)
+    return java.run
+  }
+  async launch (options, dist, store) {
     try {
       await this.init(options, dist)
-      await this.handler.checkJava(this.options.javaPath || 'java')
-
+      await this.checkJava(this.options.root)
       this.createRootDirectory()
       this.createGameDirectory()
 
-      if (this.dist.mods && this.dist.forge) {
-        await this.handler.getModrinth(this.dist, this.dist.mods, 'mods', 'mod', 'client')
-      }
+      if (!this.handler.isDeepEqual(dist, store.dist)) {
+        if (this.dist.mods && this.dist.forge) {
+          await this.handler.getModrinth(this.dist, this.dist.mods, 'mods', 'mod', 'client')
+        }
 
-      if (this.dist.resourcepacks) {
-        await this.handler.getModrinth(this.dist, this.dist.resourcepacks, 'resourcepacks', 'resourcepacks', 'client')
-      }
+        if (this.dist.resourcepacks) {
+          await this.handler.getModrinth(this.dist, this.dist.resourcepacks, 'resourcepacks', 'resourcepacks', 'client')
+        }
 
-      if (this.dist.shaders) {
-        await this.handler.getModrinth(this.dist, this.dist.shaders, 'shaderpacks', 'shaderpacks', 'client')
-      }
+        if (this.dist.shaders) {
+          await this.handler.getModrinth(this.dist, this.dist.shaders, 'shaderpacks', 'shaderpacks', 'client')
+        }
 
-      if (this.dependencies) {
-        await this.handler.getModrinth(this.dist, this.dependencies, 'mods', 'mod', 'client').then(() => this.dependencies = [])
+        if (this.dependencies) {
+          await this.handler.getModrinth(this.dist, this.dependencies, 'mods', 'mod', 'client').then(() => this.dependencies = [])
+        }
       }
 
       await this.extractPackage()

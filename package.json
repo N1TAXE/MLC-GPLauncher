@@ -6,9 +6,11 @@
   "dependencies": {
     "adm-zip": "0.5.10",
     "checksum": "^0.1.1",
-    "njre": "^1.1.0",
+    "node-fetch": "^3.3.2",
     "request": "^2.88.2",
-    "uuid": "^8.3.2"
+    "tar": "^6.2.1",
+    "uuid": "^8.3.2",
+    "yauzl": "^3.1.2"
   },
   "devDependencies": {
     "@types/checksum": "^0.1.35",
