@@ -339,7 +339,7 @@ declare module "gpl-core" {
   import { ChildProcessWithoutNullStreams } from 'child_process'
 
   export class Client extends EventEmitter {
-    launch(options: ILauncherOptions, dist: DistTypes): Promise<ChildProcessWithoutNullStreams | null>;
+    launch(options: ILauncherOptions, dist: DistTypes, store: object): Promise<ChildProcessWithoutNullStreams | null>;
     checkJava(gameRoot: string);
     downloadServer(options: ILauncherOptions, dist: DistTypes): Promise<ChildProcessWithoutNullStreams | null>;
     checkIfVersionDownloaded(options: ILauncherOptions, dist: DistTypes): Promise<boolean>;
