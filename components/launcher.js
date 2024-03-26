@@ -153,26 +153,24 @@ class GPLCore extends EventEmitter {
     }
   }
 
-  async downloadServer (options, dist) {
+  async downloadServer (options, dist, store) {
     try {
       await this.init(options, dist)
-      const java = await this.handler.checkJava(this.options.javaPath || 'java')
-      if (!java.run) {
-        this.emit('debug', `[MCLC]: Couldn't start Minecraft due to: ${java.message}`)
-        this.emit('close', 1)
-        return null
-      }
+      await this.checkJava(this.options.root)
 
       this.createRootDirectory()
       this.createGameDirectory()
 
-      if (this.dist.mods && this.dist.forge) {
-        await this.handler.getModrinth(this.dist, this.dist.mods, 'server/mods', 'mod', 'server')
+      if (!this.handler.isDeepEqual(dist, store.dist)) {
+        if (this.dist.mods && this.dist.forge) {
+          await this.handler.getModrinth(this.dist, this.dist.mods, 'server/mods', 'mod', 'server')
+        }
+
+        if (this.dependencies) {
+          await this.handler.getModrinth(this.dist, this.dependencies, 'server/mods', 'mod', 'server').then(() => this.dependencies = [])
+        }
       }
 
-      if (this.dependencies) {
-        await this.handler.getModrinth(this.dist, this.dependencies, 'server/mods', 'mod', 'server').then(() => this.dependencies = [])
-      }
       const serverDir = path.join(this.options.overrides.gameDirectory, 'server')
       if (!fs.existsSync(serverDir)) {
         fs.mkdirSync(serverDir, { recursive: true })
