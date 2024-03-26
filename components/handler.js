@@ -18,50 +18,34 @@ class Handler {
     })
   }
 
-  checkJava (gameRoot) {
+  checkJava () {
     return new Promise(resolve => {
-      child.exec(`java -version`, (error, stdout, stderr) => {
-        if (error) {
-          try {
-            child.exec(`"${gameRoot}/jre/bin/java.exe" -version`, (err, stdout, stderr) => {
-              if (err) {
-                install(17)
-                    .then(dir => {
-                      this.client.emit('debug', `[MCLC]: Dir: ${dir} - Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
-                      resolve({
-                        run: true,
-                        javapath: `${gameRoot}/jre/bin/java.exe`
-                      })
-                    })
-                    .catch(err => {
-                      resolve({
-                        run: false,
-                        message: err
-                      })
-                    })
-              } else {
-                this.client.emit('debug', `[MCLC]: Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
-                resolve({
-                  run: true,
-                  javapath: `${gameRoot}/jre/bin/java.exe`
-                })
-              }
-            })
-          } catch (e) {
-            resolve({
-              run: false,
-              message: e
-            })
-          }
-        } else {
-          this.client.emit('debug', `[MCLC]: Using Java version ${stderr.match(/"(.*?)"/).pop()} ${stderr.includes('64-Bit') ? '64-bit' : '32-Bit'}`)
+      let spawn = require('child_process').spawn('java', ['-version']);
+      spawn.on('error', function(err){
+        resolve({
+          run: false,
+          message: err
+        })
+      })
+      spawn.stderr.on('data', function(data) {
+        data = data.toString().split('\n')[0];
+        let javaVersion = new RegExp('java version').test(data) ? data.split(' ')[2].replace(/"/g, '') : false;
+        if (javaVersion !== false && javaVersion !== '1.8.0_402') {
           resolve({
-            run: true,
-            javapath: 'java'
+            run: true
+          })
+        } else {
+          resolve({
+            run: false,
+            message: 'incorrect java version'
           })
         }
-      })
+      });
     })
+  }
+
+  async installJava() {
+    install(8)
   }
 
   downloadAsync (url, directory, name, retry, type) {

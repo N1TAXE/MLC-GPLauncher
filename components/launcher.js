@@ -38,14 +38,14 @@ class GPLCore extends EventEmitter {
     this.handler = new Handler(this)
     this.printVersion()
   }
-  async checkJava(gameRoot){
-    const java = await this.handler.checkJava(gameRoot)
+  async checkJava(){
+    const java = await this.handler.checkJava()
     return java.run
   }
   async launch (options, dist, store) {
     try {
       await this.init(options, dist)
-      await this.checkJava(this.options.root)
+
       this.createRootDirectory()
       this.createGameDirectory()
 
@@ -155,7 +155,6 @@ class GPLCore extends EventEmitter {
   async downloadServer (options, dist, store) {
     try {
       await this.init(options, dist)
-      await this.checkJava(this.options.root)
 
       this.createRootDirectory()
       this.createGameDirectory()
